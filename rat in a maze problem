@@ -1,126 +1,174 @@
-/* C++ program for rat in a maze problem */
-
-#include<iostream>
-
+// Magic Spells in C++ - Hacker Rank Solution
+#include <iostream>
+#include <vector>
+#include <string>
 using namespace std;
 
-bool isSafe(int r,int c,int n,int **maze)
+class Spell 
+{ 
+    private:
+        string scrollName;
+    public:
+        Spell(): scrollName("") { }
+        Spell(string name): scrollName(name) { }
+        virtual ~Spell() { }
+        string revealScrollName() 
+        {
+            return scrollName;
+        }
+};
 
+class Fireball : public Spell 
+{ 
+    private: int power;
+    public:
+        Fireball(int power): power(power) { }
+        void revealFirepower()
+        {
+            cout << "Fireball: " << power << endl;
+        }
+};
+
+class Frostbite : public Spell {
+    private: int power;
+    public:
+        Frostbite(int power): power(power) { }
+        void revealFrostpower(){
+            cout << "Frostbite: " << power << endl;
+        }
+};
+
+class Thunderstorm : public Spell 
+{ 
+    private: int power;
+    public:
+        Thunderstorm(int power): power(power) { }
+        void revealThunderpower()
+        {
+            cout << "Thunderstorm: " << power << endl;
+        }
+};
+
+class Waterbolt : public Spell 
+{ 
+    private: int power;
+    public:
+        Waterbolt(int power): power(power) { }
+        void revealWaterpower()
+        {
+            cout << "Waterbolt: " << power << endl;
+        }
+};
+
+class SpellJournal 
 {
+    public:
+        static string journal;
+        static string read() 
+        {
+            return journal;
+        }
+}; 
+string SpellJournal::journal = "";
 
- if( r < 0 || r >= n )
+void counterspell(Spell *spell) 
+{
+/* Magic Spells in C++ - Hacker Rank Solution START */
+/* Enter your code here. Read input from STDIN. Print output to STDOUT */
+    if (Fireball *s = dynamic_cast<Fireball *>(spell)) 
+    {
+        s->revealFirepower();
+    } 
+    else if (Frostbite *s = dynamic_cast<Frostbite *>(spell)) 
+    {
+        s->revealFrostpower();
+    } 
+    else if (Thunderstorm *s = dynamic_cast<Thunderstorm *>(spell)) 
+    {
+        s->revealThunderpower();
+    } 
+    else if (Waterbolt *s = dynamic_cast<Waterbolt *>(spell)) 
+    {
+        s->revealWaterpower();
+    } 
+    else 
+    {
+        string scroll_name = spell->revealScrollName();
+        string journal = SpellJournal::read();
+        size_t s_size = scroll_name.size();
+        size_t j_size = journal.size();
 
- return false;
+        if (s_size == 1 && j_size == 1 && scroll_name == journal) 
+        {
+            cout << 1 << endl;
+        } 
+        else 
+        {
+            vector<vector<size_t>> lcs_table(s_size + 1, vector<size_t>(j_size + 1));
 
- if( c < 0 || c >= n )
-
- return false;
-
- if(maze[r][c])
-
- return true;
-
- return false;
+            for (size_t i = 1; i <= s_size; ++i) 
+            {
+                for (size_t j = 1; j <= j_size; ++j) 
+                {
+                    if (scroll_name[i - 1] == journal[j - 1]) 
+                    {
+                        lcs_table[i][j] = lcs_table[i - 1][j - 1] + 1;
+                    } 
+                    else 
+                    {
+                        lcs_table[i][j] = max(lcs_table[i][j - 1], lcs_table[i - 1][j]);
+                    } 
+                }
+            }
+          cout << lcs_table[s_size][j_size] << endl;
+        }
+    }
+/* Magic Spells in C++ - Hacker Rank Solution END */
 
 }
 
-bool solvemaze(int ** maze,int i,int j,int ** soln,int n)
-
+class Wizard 
 {
+    public:
+        Spell *cast() 
+        {
+            Spell *spell;
+            string s; cin >> s;
+            int power; cin >> power;
+            if(s == "fire") 
+            {
+                spell = new Fireball(power);
+            }
+            else if(s == "frost") 
+            {
+                spell = new Frostbite(power);
+            }
+            else if(s == "water") 
+            {
+                spell = new Waterbolt(power);
+            }
+            else if(s == "thunder") 
+            {
+                spell = new Thunderstorm(power);
+            } 
+            else 
+            {
+                spell = new Spell(s);
+                cin >> SpellJournal::journal;
+            }
+            return spell;
+        }
+};
 
- if(i == n-1 && j == n-1)
-
- {
-
- soln[i][j]=1;
-
- return true;
-
- }
-
- if(isSafe(i,j,n,maze))
-
- {
-
- soln[i][j]=1;
-
- if(solvemaze(maze,i+1,j,soln,n))
-
- return true;
-
- if(solvemaze(maze,i,j+1,soln,n))
-
- return true;
-
- soln[i][j]=0;
-
- }
-
- return false;
-
-}
-
-int main()
-
+int main() 
 {
-
- int n;
-
- cin>>n;
-
- int** maze = new int*[n];
-
- for(int i = 0; i < n; ++i)
-
- maze[i] = new int[n];
-
- int** soln = new int*[n];
-
- for(int i = 0; i < n; ++i)
-
- soln[i] = new int[n];
-
- for(int i=0;i<n;i++)
-
- {
-
- for(int j=0;j<n;j++)
-
- {
-
- cin>>maze[i][j];
-
- soln[i][j]=0;
-
- }
-
- }
-
- if(solvemaze(maze,0,0,soln,n))
-
- {
-
- for(int i=0;i<n;i++)
-
- {
-
- for(int j=0;j<n;j++)
-
- cout<<soln[i][j]<<" ";
-
- cout<<endl;
-
- }
-
- }
-
- else
-
- {
-
-cout<<"-1";
-
- }
-
+    int T;
+    cin >> T;
+    Wizard Arawn;
+    while(T--) 
+    {
+        Spell *spell = Arawn.cast();
+        counterspell(spell);
+    }
+    return 0;
 }
-
